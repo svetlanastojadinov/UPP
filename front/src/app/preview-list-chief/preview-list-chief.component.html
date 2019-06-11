@@ -1,0 +1,7 @@
+<div [hidden]="articles">There are not articles for review!</div>
+<form #f="ngForm" >
+  <div *ngFor="let a of articles" >
+  <label><b>Title: </b></label> {{a.title}}<br> <label><b>Abstract: </b></label> {{a.abst}}<br> 
+  <button class="btn btn-primary" (click)="view(a)">View</button>
+</div>
+</form>

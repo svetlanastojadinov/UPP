@@ -1,0 +1,22 @@
+<div align="center">
+  <form #f="ngForm" (ngSubmit)="onSubmit(f.value, f)" ngNativeValidate>
+  
+    <div *ngFor="let field of formFields" >
+        <input type="file" name={{field.id}} ngModel *ngIf="field.id=='file'"
+        id="file"
+        (change)="handleFileInput($event.target.files)"/>
+        
+        <input placeholder={{field.label}} type="text" name={{field.id}} ngModel  *ngIf="field.type.name=='string' && field.id!='file'" >
+        <input type="checkbox" name={{field.id}} ngModel  *ngIf="field.type.name=='boolean'">
+        <input type="number" name={{field.id}} ngModel  *ngIf="field.type.name=='long'">
+        <select name="sc.name" *ngIf="field.type.name=='enum'" [(ngModel)]="sc">
+          <option *ngFor="let val of scientificAreas" >
+            {{val.name}}
+          </option>
+        </select>
+    </div>
+    
+    <input type="submit">
+  </form>
+
+  </div>

@@ -1,0 +1,21 @@
+<div align="center">
+  <label><b>Title: </b></label> {{article.title}}<br>
+  <label><b>Abstract: </b></label> {{article.abst}}<br> 
+  <label><b>Key words: </b></label> {{article.keyWords}}<br> 
+
+  <form #f="ngForm" (ngSubmit)="onSubmit(f.value, f)" ngNativeValidate>
+  
+        <select name="des"   [(ngModel)]="desicion">
+          <option *ngFor="let val of des" >
+            {{val}}
+          </option>
+        </select><br/>
+        <input type="text" name="comment" [(ngModel)]="comment"/><br/>
+        <input type="text" name="commentForEditor" [(ngModel)]="commentForEditor"/><br/>
+       
+    <button class="btn btn-primary">Get pdf</button>
+    <input type="submit" class="btn btn-primary">
+  </form>
+  
+ 
+  </div>

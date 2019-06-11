@@ -1,0 +1,20 @@
+<header class="header">
+<nav class="navbar navbar-default">
+    <div class="nav-left">
+        <ul>
+            <li><a href="#/home">Home</a></li>
+            <li><a *ngIf='role=="AUTOR"' href="/edit-article-author">Edit article</a></li>
+            <li><a *ngIf='role=="AUTOR"' href="/pick-magazine">Pick magazine</a></li>
+            <li><a *ngIf='role=="GLAVNI_UREDNIK"'href="/preview-list-chief">View tasks</a></li>
+        </ul>
+    </div>
+    <div class="nav-right">
+        <ul>
+            <li><a *ngIf='loggedIn()==false' href="/registrate">Registrate</a></li>
+            <li><a *ngIf='loggedIn()==false' href="/login">Log in</a></li>
+            <li *ngIf='loggedIn()==true' (click)="logOut()" class="ListPointer"><a>Log out</a></li>
+            <li *ngIf='loggedIn()==true'><font color="grey">Zdravo,{{user}}!</font></li>
+        </ul>
+    </div>
+</nav>
+<router-outlet></router-outlet>

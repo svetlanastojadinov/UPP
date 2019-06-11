@@ -1,0 +1,13 @@
+<div align="center">
+<select [(ngModel)]="magazine">
+  <option *ngFor="let c of magazines" [ngValue]="c">{{c.title}}</option>
+</select><br>
+<button 
+    type="button"
+    (click)="picked()"
+    class="btn btn-primary"
+  >
+    Izaberi magazin
+  </button>
+</div>
+

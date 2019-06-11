@@ -1,0 +1,8 @@
+<b>Choose reviewers</b><br><br>
+<label *ngIf="flag">You are reviewer for this article! ;)</label>
+<form #f="ngForm" (ngSubmit)="submit()">
+  <label  *ngFor="let a of rec">
+    <input type="checkbox"  [(ngModel)]="a.checked" name="a.name"/>{{a.name}}   <br> 
+   </label>
+    <br><button class="btn btn-primary">Done</button>
+ </form>   

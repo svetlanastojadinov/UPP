@@ -1,0 +1,27 @@
+<div align="center">
+    <label><b>Title: </b></label> {{article.title}}<br>
+    <label><b>Abstract: </b></label> {{article.abst}}<br> 
+    <label><b>Key words: </b></label> {{article.keyWords}}<br> 
+  
+    <form #f="ngForm" (ngSubmit)="onSubmit(f.value, f)" ngNativeValidate>
+    
+      <div *ngFor="let field of formFields" >
+          <label for={{field.id}}>{{field.label}}</label>
+    
+          <input type="text" name={{field.id}} ngModel  *ngIf="field.type.name=='string' && field.id!='password' && field.id!='password1'" >
+          <input type="password" name={{field.id}} ngModel  *ngIf="field.type.name=='string' && field.id=='password'" >
+          <input type="password" name={{field.id}} ngModel  *ngIf="field.type.name=='string' && field.id=='password1'" >
+          <input type="checkbox" name={{field.id}} ngModel  *ngIf="field.type.name=='boolean'">
+          <input type="number" name={{field.id}} ngModel  *ngIf="field.type.name=='long'">
+          <select name="des" *ngIf="field.type.name=='enum'"  [(ngModel)]="des">
+            <option *ngFor="let val of enumValues" >
+              {{field.type.values[val]}}
+            </option>
+          </select>
+      </div>
+      <button class="btn btn-primary">Get pdf</button>
+      <input type="submit" class="btn btn-primary">
+    </form>
+    
+   
+    </div>
