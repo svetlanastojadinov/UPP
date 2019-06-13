@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { RepositoryService } from '../services/repository/repository.service';
 import { FormGroup, FormBuilder, FormControl, FormArray , ReactiveFormsModule, FormsModule} from '@angular/forms';
+import { ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'app-list-recez',
@@ -12,14 +13,16 @@ export class ListRecezComponent implements OnInit {
   rec : any;
   private izabrani=[];
   private flag=false;
-  private issn="93545180";
-  private id="17";
+  private magazine;
+  private issn:string;
   private formFieldsDto = null;
   private formFields = [];
   private processInstance = "";
   private enumValues = [];
   private tasks = [];
-  constructor(private repositoryService :RepositoryService) {  
+  private id=undefined;
+  private article={};
+  constructor(private repositoryService :RepositoryService,private activatedRoute: ActivatedRoute) {  
     let x = repositoryService.getTask("posting_process","Choosing_reviewers");
 
   x.subscribe(
@@ -43,22 +46,34 @@ export class ListRecezComponent implements OnInit {
   
   }
 
-
   ngOnInit() {
-    this.rec=this.repositoryService.getRecezenti(this.issn).subscribe(
-      res => {
-        console.log(res);
-        this.rec=res;
-        if(this.rec.length==0){
-          this.flag=true;
-        }
-      })
+    this.activatedRoute.params.subscribe(params => {
+      this.id = params['id'];
+      console.log("article id "+this.id);
 
-    for(var i=0;i<this.rec.length;i++){
-      this.rec[i].checked=false;
-    }
-   
-  }
+      this.repositoryService.getOneMagazineByArticle(this.id).subscribe(
+        res=>{
+          this.magazine=res.issn;
+          console.log("***** "+this.magazine);
+
+          this.rec=this.repositoryService.getRecezenti(this.magazine).subscribe(
+            res => {
+              console.log(res);
+              this.rec=res;
+              if(this.rec.length==0){
+                this.flag=true;
+              }
+           })
+  
+          for(var i=0;i<this.rec.length;i++){
+            this.rec[i].checked=false;
+           }
+          })  
+        }
+      )
+
+    
+}
   get selectedOptions() { // right now: ['1','3']
   return this.rec
             .filter(opt => opt.checked)
@@ -71,16 +86,17 @@ export class ListRecezComponent implements OnInit {
       console.log("******");
       rec=localStorage.getItem('author');
       console.log("rec "+rec);
+      
     }
     let x = this.repositoryService.setRecezenti(this.formFieldsDto.taskId,this.id,rec);
     x.subscribe(
       res => {
         console.log(res);
+        window.location.href = '/home';
       },
       err=>{
         console.log(err);
       })
-    console.log(this.selectedOptions);
   }
 
 }

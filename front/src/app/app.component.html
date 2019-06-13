@@ -4,7 +4,8 @@
         <ul>
             <li><a href="#/home">Home</a></li>
             <li><a *ngIf='role=="AUTOR"' href="/edit-article-author">Edit article</a></li>
-            <li><a *ngIf='role=="AUTOR"' href="/pick-magazine">Pick magazine</a></li>
+            <li><a *ngIf='role=="AUTOR" ' href="/pick-magazine">Submit new Article</a></li>
+            <li><a *ngIf='role=="RECEZENT" ' href="/comment-article">View Tasks</a></li>
             <li><a *ngIf='role=="GLAVNI_UREDNIK"'href="/preview-list-chief">View tasks</a></li>
         </ul>
     </div>

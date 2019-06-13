@@ -16,13 +16,13 @@ private choosen_category = -1;
 private processInstance = "";
 private enumValues = [];
 private tasks = [];
-private id="17";
 private article:any={};
 user=localStorage.getItem('author');
 private comment:string;
 private commentForEditor:string;
 private des=["Article is irelevant","Article should be edited","Article is accepted"];
 private desicion:string; 
+private bool=false;
 
 constructor(private repositoryService: RepositoryService,private activatedRoute: ActivatedRoute) { 
   let x = repositoryService.getTaskByA("posting_process","Entering comments",this.user);
@@ -48,8 +48,7 @@ x.subscribe(
 }
 
 ngOnInit() {
-  this.activatedRoute.params.subscribe(params => {
-    this.repositoryService.getOneArticle(this.id).subscribe(
+    this.repositoryService.getArticleForRecezent(this.user).subscribe(
       res=>{
         console.log(res);
         this.article.title=res.title;
@@ -57,7 +56,7 @@ ngOnInit() {
         this.article.keyWords=res.keyWords;
       }
     );
-  }); 
+
 }
 
 onSubmit(value, form){
@@ -65,9 +64,10 @@ onSubmit(value, form){
   console.log(" "+this.desicion);
   console.log("--- "+this.commentForEditor);
 
-  this.repositoryService.aproveArticleRecezent(this.formFieldsDto.taskId,this.desicion,this.comment,this.commentForEditor).subscribe(
+  this.repositoryService.aproveArticleRecezent(this.formFieldsDto.taskId,this.desicion,this.comment,this.commentForEditor,this.article.title,this.user).subscribe(
     res => {
       console.log(res);
+      this.bool=true;
   },
   err=>{
     alert('Faild to sent article. Please, try again later.');

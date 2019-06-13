@@ -24,7 +24,7 @@ export class LoginComponent implements OnInit {
         console.log(res);
         localStorage.setItem("author",f.value.username);
         localStorage.setItem("role",res.role);
-        window.location.href = '/pick-magazine';
+        window.location.href = '/home';
       },
       err=>{
         console.log(err);

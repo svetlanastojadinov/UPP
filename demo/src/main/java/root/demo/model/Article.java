@@ -51,6 +51,9 @@ public class Article implements Serializable {
 	@JoinColumn(name = "article_id")
 	private Set<User> recezenti;
 	
+	@Column
+	private String chiefEditor;
+	
 	public Article() {
 		super();
 		this.status = ArticleStatus.PREGLEDA_SE;
@@ -134,6 +137,15 @@ public class Article implements Serializable {
 	
 	public Set<User> getRecezenti() {
 		return recezenti;
+	}
+	
+
+	public String getChiefEditor() {
+		return chiefEditor;
+	}
+
+	public void setChiefEditor(String chiefEditor) {
+		this.chiefEditor = chiefEditor;
 	}
 
 	public void setRecezenti(Set<User> recezenti) {

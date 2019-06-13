@@ -30,7 +30,8 @@ import { EditArticleAuthorComponent } from './edit-article-author/edit-article-a
 import { ListRecezComponent } from './list-recez/list-recez.component';
 import { CommentArticleComponent } from './comment-article/comment-article.component';
 import { HomeComponent } from './home/home.component';
-
+import { FinalDesicionComponent } from './final-desicion/final-desicion.component';
+import { AproveArticleComponent1 } from './aprove-article.1/aprove-article.component';
 const ChildRoutes =
   [
   ]
@@ -78,6 +79,11 @@ const Routes = [
     canActivate:[Notauthorized]
   },
   {
+    path: "aprove-article1/:id",
+    component: AproveArticleComponent1,
+    canActivate:[Notauthorized]
+  },
+  {
     path: "preview-list-chief",
     component: PreviewListChiefComponent,
     canActivate:[Notauthorized]
@@ -87,7 +93,7 @@ const Routes = [
     component: HomeComponent,
     canActivate:[Notauthorized]
   },{
-    path: "list-recez",
+    path: "list-recez/:id",
     component: ListRecezComponent,
     canActivate:[Notauthorized]
   },
@@ -100,6 +106,12 @@ const Routes = [
     path:"comment-article",
     component: CommentArticleComponent,
     canActivate:[Notauthorized]
+  },
+  {
+    path:"final-desicion",
+    redirectTo:"/final-desicion",
+    commponent: FinalDesicionComponent,
+    canActivate: [Notauthorized]
   }
 ]
 
@@ -114,11 +126,13 @@ const Routes = [
     PickMagazineComponent,
     NewArticleComponent,
     AproveArticleComponent,
+    AproveArticleComponent1,
     PreviewListChiefComponent,
     EditArticleAuthorComponent,
     ListRecezComponent,
     CommentArticleComponent,
-    HomeComponent
+    HomeComponent,
+    FinalDesicionComponent
   ],
   imports: [
     BrowserModule,

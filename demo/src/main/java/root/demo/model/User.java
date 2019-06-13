@@ -65,6 +65,7 @@ public class User implements Serializable {
 	@JsonIgnore
 	@JoinColumn(name = "scientific_area_id", nullable = true)
 	private ScientificArea area;
+	
 
 	// created
 	// @OneToMany(fetch = FetchType.LAZY, mappedBy = "user")

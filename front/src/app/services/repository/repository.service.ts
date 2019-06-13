@@ -58,6 +58,9 @@ export class RepositoryService {
   getOneMagazine(id: string) {
     return this.httpClient.get("http://localhost:8080/api/magazines/".concat(id)) as Observable<any>
   }
+  getOneMagazineByArticle(id: string) {
+    return this.httpClient.get("http://localhost:8080/api/magazines/article=".concat(id)) as Observable<any>
+  }
   getOneArticle(id: string) {
     return this.httpClient.get("http://localhost:8080/api/articles/"+id) as Observable<any>
   }
@@ -67,6 +70,9 @@ export class RepositoryService {
   }
   getArticleForEdit(username:string){
     return this.httpClient.get("http://localhost:8080/api/articles/edito=".concat(username)) as Observable<any>
+  }
+  getArticleForRecezent(username:string){
+    return this.httpClient.get("http://localhost:8080/api/articles/recezent=".concat(username)) as Observable<any>
   }
 //"/recezenti/{area}"
 getRecezenti(magId:string){
@@ -82,16 +88,19 @@ setRecezenti(taskId:string,issn:string,list:any){
   aproveArticle(o:any, taskId:string,article:string) {
     return this.httpClient.post("http://localhost:8080/api/articles/"+taskId+"/aprove="+article,o) as Observable<any>
   }
-  aproveArticleRecezent(taskId:string,des:string,comment:string,commentForEditor:string) {
-    return this.httpClient.post("http://localhost:8080/api/articles/task="+taskId+"/des="+des,null) as Observable<any>
+  aproveArticleFinal(des:string, taskId:string,article:string) {
+    return this.httpClient.post("http://localhost:8080/api/articles/"+taskId+"/aproveFinal="+article+"/des="+des,null) as Observable<any>
+  }
+  aproveArticleRecezent(taskId:string,des:string,comment:string,commentForEditor:string,id:string,recez:string) {
+    return this.httpClient.post("http://localhost:8080/api/articles/task="+taskId+"/des="+des+'/c='+comment+'/c2='+commentForEditor+'/id='+id+'/rec='+recez,null) as Observable<any>
   }
 
   getScientificAreas(){
     return this.httpClient.get("http://localhost:8080/api/scientificarea") as Observable<any>
   }
   
-  uploadMagazine(o: any,taskId:string,id:string,file: File): Observable<HttpEvent<{}>>  {
-    console.log("sada smo ovde "+file.name);
+  uploadMagazine(o: any,taskId:string,id:string, username:string, file: File): Observable<HttpEvent<{}>>  {
+ //   console.log("salje "+username+" "+file.name);
     
     let formdata: FormData = new FormData();
    
@@ -102,7 +111,7 @@ setRecezenti(taskId:string,issn:string,list:any){
       var sc=o[3].fieldValue;
 
       console.log("1");
-      const req = new HttpRequest('POST', 'http://localhost:8080/api/articles/add='+taskId+'/id='+id+'/title='+title+'/area='+sc+'/keyWords='+key_words+'/abstract='+abstract, formdata, {
+      const req = new HttpRequest('POST', 'http://localhost:8080/api/articles/add='+taskId+'/id='+id+'/title='+title+'/area='+sc+'/keyWords='+key_words+'/abstract='+abstract+'/user='+username, formdata, {
         reportProgress: true,
         responseType: 'text'
       });

@@ -31,6 +31,7 @@ import root.demo.model.Article;
 import root.demo.model.ArticleStatus;
 import root.demo.model.Magazine;
 import root.demo.model.Subscription;
+import root.demo.model.User;
 import root.demo.model.dto.FormSubmissionDto;
 import root.demo.service.ArticleService;
 import root.demo.service.MagazineService;
@@ -67,28 +68,38 @@ public class ArticleController {
 		}
 		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 	}
+	//http://localhost:8080/api/articles/"+taskId+"/aproveFinal="+article+"/des="+des
+	@RequestMapping(value = "/{taskId}/aproveFinal={article}/des={finalDes}", method = RequestMethod.POST)
+	private ResponseEntity<?> finalDesicion(@PathVariable String taskId, @PathVariable String article,
+			@PathVariable String finalDes) {
+		
+		Task task = taskService.createTaskQuery().taskId(taskId).singleResult();
+		String processInstanceId = task.getProcessInstanceId();
 
-	@RequestMapping(value = "/chief={username}", method = RequestMethod.GET)
-	public ResponseEntity<Collection<Article>> getArticlesForChiefEditor(@PathVariable String username) {
-		ArrayList<Article> articles = (ArrayList<Article>) articleService.findAll();
-		ArrayList<Article> articles1 = new ArrayList<>();
-		ArrayList<Magazine> mags = (ArrayList<Magazine>) magazineService.findAll();
-		if (articles != null) {
-			for (Magazine m : mags) {
-				if (m.getUser().getUsername().equals(username)) {
-					for (Article a : articles) {
-						if (m.getArea().getName().equals(a.getScArea().getName())) {
-							if (a.getStatus() == ArticleStatus.EDITUJE_SE
-									|| a.getStatus() == ArticleStatus.PREGLEDA_SE) {
-								articles1.add(a);
-							}
-						}
-					}
+		Article a=articleService.findOne(Long.parseLong(article));
+		if(finalDes.equals("Accept"))
+			a.setStatus(ArticleStatus.PRIHVACEN);
+		else if(finalDes.equals("Reject"))
+			a.setStatus(ArticleStatus.ODBIJEN);
+		else
+			a.setStatus(ArticleStatus.EDITUJE_SE);
+		runtimeService.setVariable(processInstanceId, "finalDes", finalDes);
+		System.err.println("final desicion "+finalDes);
+		formService.submitTaskForm(taskId, null);
+
+		return new ResponseEntity<>(HttpStatus.OK);
+	}
+
+	@RequestMapping(value = "/recezent={username}", method = RequestMethod.GET)
+	public ResponseEntity<Article> getArticlesForRecezent(@PathVariable String username) {
+		for (Article a : articleService.findAll()) {
+			for (User u : a.getRecezenti()) {
+				if (u.getUsername().equals(username)) {
+					return new ResponseEntity<>(a, HttpStatus.OK);
 				}
 			}
-			return new ResponseEntity<Collection<Article>>(articles1, HttpStatus.OK);
 		}
-		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+		return new ResponseEntity<>(null, HttpStatus.NO_CONTENT);
 	}
 
 	@RequestMapping(value = "/{id}", method = RequestMethod.GET)
@@ -152,24 +163,28 @@ public class ArticleController {
 		return new ResponseEntity<Article>(new Article(), HttpStatus.OK);
 	}
 
-	@RequestMapping(value = "/add={taskId}/id={id}/title={title}/area={area}/keyWords={keyWords}/abstract={abst}", method = RequestMethod.POST)
+	@RequestMapping(value = "/add={taskId}/id={id}/title={title}/area={area}/keyWords={keyWords}/abstract={abst}/user={username}", method = RequestMethod.POST)
 	private ResponseEntity<String> addArticle(@PathVariable String taskId, @PathVariable String id,
 			@PathVariable String title, @PathVariable String area, @PathVariable String keyWords,
-			@PathVariable String abst, @RequestParam("file") MultipartFile file) {
+			@PathVariable String abst, @PathVariable String username, @RequestParam("file") MultipartFile file) {
 		String message = "";
 
 		try {
+			System.out.println("1.1");
 			String filenamePath = saveUploadedFile(file);
-
+			System.out.println(filenamePath);
 			message = "You successfully uploaded file to" + filenamePath + "!";
-
 			Article newArt = new Article();
 			newArt.setTitle(title.replace('+', ' '));
 			newArt.setAbst(abst.replace('+', ' '));
 			newArt.setKeyWords(keyWords.replace('+', ' '));
 			newArt.setFilePath(filenamePath);
-			newArt.setScArea(scAreaService.findOneByName(area));
+			newArt.setAuthor(username);
+
 			Magazine mag = magazineService.findOne(id);
+			newArt.setChiefEditor(mag.getUser().getUsername());
+			newArt.setScArea(scAreaService.findOneByName(area));
+
 			mag.addArticle(newArt);
 
 			articleService.save(newArt);
@@ -190,15 +205,16 @@ public class ArticleController {
 
 	@SuppressWarnings("rawtypes")
 	@RequestMapping(value = "/{taskId}/aprove={articleId}", method = RequestMethod.POST)
-	private ResponseEntity<?> aproveArticle(@RequestBody List<FormSubmissionDto> dto, @PathVariable String taskId,@PathVariable String articleId) {
+	private ResponseEntity<?> aproveArticle(@RequestBody List<FormSubmissionDto> dto, @PathVariable String taskId,
+			@PathVariable String articleId) {
 		HashMap<String, Object> map = this.mapListToDto(dto);
-		Article article=articleService.findOne(Long.parseLong(articleId));
-		System.err.println("artikal "+article.getTitle()+" odluka " + dto.get(0).getFieldValue());
+		Article article = articleService.findOne(Long.parseLong(articleId));
+		System.err.println("artikal " + article.getTitle() + " odluka " + dto.get(0).getFieldValue());
 		if (dto.get(0).getFieldValue().equals("Article is irelevant")) {
 			article.setStatus(ArticleStatus.ODBIJEN);
-		}else if(dto.get(0).getFieldValue().equals("Article should be corrected")){
+		} else if (dto.get(0).getFieldValue().equals("Article should be corrected")) {
 			article.setStatus(ArticleStatus.EDITUJE_SE);
-		}else if(dto.get(0).getFieldValue().equals("Accept article")) {
+		} else if (dto.get(0).getFieldValue().equals("Accept article")) {
 			article.setStatus(ArticleStatus.RECEZENTIRA_SE);
 		}
 		Task task = taskService.createTaskQuery().taskId(taskId).singleResult();
@@ -209,15 +225,44 @@ public class ArticleController {
 		return new ResponseEntity(HttpStatus.OK);
 
 	}
-	//("http://localhost:8080/api/articles/task="+taskId+"/des="+des
-	@SuppressWarnings("rawtypes")
-	@RequestMapping(value = "/task={taskId}/des={des}", method = RequestMethod.POST)
-	private ResponseEntity<?> aproveArticleRecezent(@PathVariable String taskId,@PathVariable String des) {
-		
-		Task task = taskService.createTaskQuery().taskId(taskId).singleResult();
-		String processInstanceId = task.getProcessInstanceId();
-		System.out.println("taskid "+taskId+" des "+des);
 
+	@RequestMapping(value = "/chief={username}", method = RequestMethod.GET)
+	public ResponseEntity<Collection<Article>> getArticlesForChiefEditor(@PathVariable String username) {
+		ArrayList<Article> articles = (ArrayList<Article>) articleService.findAll();
+		ArrayList<Article> articles1 = new ArrayList<>();
+		ArrayList<Magazine> mags = (ArrayList<Magazine>) magazineService.findAll();
+		if (articles != null) {
+			for (Magazine m : mags) {
+				if (m.getUser().getUsername().equals(username)) {
+					for (Article a : articles) {
+						if (m.getArea().getName().equals(a.getScArea().getName())) {
+							if (a.getStatus() == ArticleStatus.EDITUJE_SE
+									|| a.getStatus() == ArticleStatus.PREGLEDA_SE) {
+								articles1.add(a);
+							}
+						}
+					}
+				}
+			}
+			return new ResponseEntity<Collection<Article>>(articles1, HttpStatus.OK);
+		}
+		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+	}
+
+	// task="+taskId+"/des="+des+'/c='+comment+'/c2='+commentForEditor+'/id='+id+'/rec='+recez
+	@SuppressWarnings("rawtypes")
+	@RequestMapping(value = "/task={taskId}/des={des}/c={comment}/c2={commentForChief}/id={id}/rec={rec}", method = RequestMethod.POST)
+	private ResponseEntity<?> aproveArticleRecezent(@PathVariable String taskId, @PathVariable String des,
+			@PathVariable String comment, @PathVariable String commentForChief, @PathVariable String id,
+			@PathVariable String rec) {
+
+		Task task = taskService.createTaskQuery().taskId(taskId).singleResult();
+		System.out.println("taskid " + taskId + " des " + des+" com"+comment+"  "+commentForChief+"  "+id+"  "+rec);
+		String processInstanceId = task.getProcessInstanceId();
+		String desicion="For "+id+".\nDesicion: "+des+". Comment: "+comment+".\nComment for chief: "+commentForChief;
+		runtimeService.setVariable(processInstanceId, "recezent"+rec, desicion);
+
+		formService.submitTaskForm(taskId, null);
 		return new ResponseEntity(HttpStatus.OK);
 
 	}

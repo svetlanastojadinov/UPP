@@ -24,6 +24,8 @@ export class NewArticleComponent implements OnInit {
   private scientificAreas: any = [];
   private id=undefined;
   private sc:any={};
+  private username=localStorage.getItem('author');
+  private bool=false;
 
   constructor(private repositoryService: RepositoryService,private activatedRoute: ActivatedRoute) { 
     let x = repositoryService.getTask("posting_process","Entering_data");
@@ -67,14 +69,15 @@ export class NewArticleComponent implements OnInit {
 
     console.log(o);
   
-    this.repositoryService.uploadMagazine(o,this.formFieldsDto.taskId,this.id,this.fileToUpload).subscribe(
+    this.repositoryService.uploadMagazine(o,this.formFieldsDto.taskId,this.id,this.username,this.fileToUpload).subscribe(
       res => {
      // console.log(data);
-    //  alert('Article sent to Chief Editor.');
+   //    alert('Article sent to Chief Editor.');
      // this.router.navigate(["/center"]);
-   //  window.location.href = '/home';
+    // window.location.href = '/home';
+    this.bool=true;
     },
-    err=>{o
+    err=>{
       alert('Faild to sent article. Please, try again later.');
      
     });

@@ -11,8 +11,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import root.demo.model.Article;
 import root.demo.model.Magazine;
 import root.demo.model.User;
+import root.demo.service.ArticleService;
 import root.demo.service.MagazineService;
 
 @RestController
@@ -21,6 +23,9 @@ public class MagazineController {
 
 	@Autowired
 	private MagazineService magazineService;
+	
+	@Autowired
+	private ArticleService articleService;
 
 	@GetMapping
 	public ResponseEntity<Collection<Magazine>> getMagazines() {
@@ -34,6 +39,22 @@ public class MagazineController {
 		Magazine magazine = magazineService.findOne(issn);
 
 		return new ResponseEntity<Magazine>(magazine, HttpStatus.OK);
+
+	}
+	@RequestMapping(value = "/article={id}", method = RequestMethod.GET)
+	public ResponseEntity<Magazine> getMagazineForArticle(@PathVariable String id) {
+		Magazine magazine=null;
+		for(Magazine m:magazineService.findAll()) {
+			for(Article a:m.getArticles()) {
+				if(a.getId()==Long.parseLong(id)) {
+					magazine=m;
+					return new ResponseEntity<Magazine>(magazine, HttpStatus.OK);
+
+				}
+			}
+		}
+		
+		return new ResponseEntity<Magazine>(magazine, HttpStatus.NOT_FOUND);
 
 	}
 	@RequestMapping(value = "/recezenti/mag={magId}", method = RequestMethod.GET)

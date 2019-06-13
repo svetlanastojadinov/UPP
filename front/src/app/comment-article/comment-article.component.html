@@ -10,12 +10,12 @@
             {{val}}
           </option>
         </select><br/>
-        <input type="text" name="comment" [(ngModel)]="comment"/><br/>
-        <input type="text" name="commentForEditor" [(ngModel)]="commentForEditor"/><br/>
+        <input type="text" name="comment" [(ngModel)]="comment" placeholder="Comment article" size="40px"/><br/>
+        <input type="text" name="commentForEditor" [(ngModel)]="commentForEditor" placeholder="Message for chief editor" size="40px"/><br/>
        
-    <button class="btn btn-primary">Get pdf</button>
-    <input type="submit" class="btn btn-primary">
+    <button class="btn btn-primary">Get pdf</button><br/>
+    <input type="submit" class="btn btn-danger" value="Finish review">
   </form>
-  
+  <label *ngIf="bool">You sent your opinion!</label>
  
   </div>

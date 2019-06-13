@@ -173,7 +173,16 @@
     </bpmn:serviceTask>
     <bpmn:sequenceFlow id="SequenceFlow_01yaxow" sourceRef="BoundaryEvent_1u4bur0" targetRef="ServiceTask_1add4jw" />
     <bpmn:sequenceFlow id="SequenceFlow_170gf6j" sourceRef="ServiceTask_1add4jw" targetRef="Task_11godcx" />
-    <bpmn:userTask id="UserTask_0cszjsm" name="Editor of area:making desicion" camunda:assignee="${glavniUrednik}">
+    <bpmn:userTask id="UserTask_0cszjsm" name="Final_desicion" camunda:assignee="${chiefEditor}">
+      <bpmn:extensionElements>
+        <camunda:formData>
+          <camunda:formField id="finalDes" label="Final desicion:" type="enum">
+            <camunda:value id="accept" name="Accept" />
+            <camunda:value id="reject" name="Reject" />
+            <camunda:value id="edit" name="Edit" />
+          </camunda:formField>
+        </camunda:formData>
+      </bpmn:extensionElements>
       <bpmn:incoming>SequenceFlow_1lr4v9x</bpmn:incoming>
       <bpmn:outgoing>SequenceFlow_010plo7</bpmn:outgoing>
     </bpmn:userTask>
@@ -190,7 +199,7 @@
       <bpmn:outgoing>SequenceFlow_07jc1xc</bpmn:outgoing>
     </bpmn:serviceTask>
     <bpmn:sequenceFlow id="SequenceFlow_0mcmhmo" name="accepted" sourceRef="ExclusiveGateway_1avs6xq" targetRef="ServiceTask_10mfk42">
-      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${des=="Article is accepted!"}</bpmn:conditionExpression>
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${finalDes=="Accept"}</bpmn:conditionExpression>
     </bpmn:sequenceFlow>
     <bpmn:serviceTask id="ServiceTask_06bn7mf" name="Notify Autor: rejection" camunda:class="root.demo.taskService.NotifyAutorRejectionService">
       <bpmn:incoming>SequenceFlow_05olhmc</bpmn:incoming>
@@ -198,7 +207,7 @@
       <bpmn:outgoing>SequenceFlow_0jjxi33</bpmn:outgoing>
     </bpmn:serviceTask>
     <bpmn:sequenceFlow id="SequenceFlow_05olhmc" name="rejected" sourceRef="ExclusiveGateway_1avs6xq" targetRef="ServiceTask_06bn7mf">
-      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${des=="Article is rejected"}</bpmn:conditionExpression>
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${finalDes=="Reject"}</bpmn:conditionExpression>
     </bpmn:sequenceFlow>
     <bpmn:endEvent id="EndEvent_0nadxw8">
       <bpmn:incoming>SequenceFlow_0jjxi33</bpmn:incoming>
@@ -209,7 +218,7 @@
       <bpmn:outgoing>SequenceFlow_0q6ht9k</bpmn:outgoing>
     </bpmn:serviceTask>
     <bpmn:sequenceFlow id="SequenceFlow_0a8d33u" name="should be edited" sourceRef="ExclusiveGateway_1avs6xq" targetRef="ServiceTask_1id38rl">
-      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${des=="Article should be corrected"}</bpmn:conditionExpression>
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${finalDes=="Edit"}</bpmn:conditionExpression>
     </bpmn:sequenceFlow>
     <bpmn:sequenceFlow id="SequenceFlow_0q6ht9k" sourceRef="ServiceTask_1id38rl" targetRef="Task_080rzqe" />
     <bpmn:userTask id="Task_080rzqe" name="Editing article" camunda:assignee="${author}">
